@@ -33,6 +33,8 @@ on PlayerPickupItemEvent:
             replace all "{@keyword}&7[&a%{_playername}%&7] " with "" in {_itname}
             {_meta}.setDisplayName({_itname})
             event.getItem().getItemStack().setItemMeta({_meta})
+        else:
+            event.cancelled(true)
 
 on MythicMobDespawnEvent:
     set {_uuid} to event.getEntity().getUniqueId()
