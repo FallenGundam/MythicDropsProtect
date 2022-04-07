@@ -12,5 +12,5 @@
 # settings:
 #### blacklist: "&cWolrdBoss" or "&bWorldBoss2"
 * 在此新增怪物的名稱以禁用保護
-#### keyword: &0MM
+#### keyword: &0#
 * 可以不用改動,這是判斷是否為mm怪物的掉落物
