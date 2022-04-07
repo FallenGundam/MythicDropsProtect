@@ -1,5 +1,5 @@
 #name: MythicDropsProtect  by FallenGundam
-#version: v1.0.0
+#version: v1.0.1
 #date: 2022/4/7
 #required:
     #paper or spigot 1.13.2~1.18.2 
@@ -21,11 +21,23 @@ import:
     io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
     io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDespawnEvent
 
+    org.bukkit.event.player.PlayerPickupItemEvent
+
+on PlayerPickupItemEvent:
+    set {_meta} to event.getItem().getItemStack().getItemMeta()
+    set {_player} to event.getPlayer()
+    set {_playername} to "%{_player}%".toLowerCase()
+    if {_meta}.getDisplayName().contains("{@keyword}"):
+        if {_meta}.getDisplayName().contains({_playername}):
+            set {_itname} to {_meta}.getDisplayName()
+            replace all "{@keyword}&7[&a%{_playername}%&7] " with "" in {_itname}
+            {_meta}.setDisplayName({_itname})
+            event.getItem().getItemStack().setItemMeta({_meta})
+
 on MythicMobDespawnEvent:
     set {_uuid} to event.getEntity().getUniqueId()
     if {mob_damage::%{_uuid}%::*} is set:
         clear {mob_damage::%{_uuid}%::*}
-
 
 on MythicMobDeathEvent:
     set {_uuid} to event.getEntity().getUniqueId()
@@ -41,33 +53,13 @@ on MythicMobDeathEvent:
 
         loop {_items}.size() times:
             set {_index} to (loop-value)-1
-            set {_item} to {_items}.get({_index})
+            set {_itemmeta} to {_items}.get({_index}).getItemMeta()
+            set {_itemname} to {_itemmeta}.getDisplayName()
+            {_itemmeta}.setDisplayName("{@keyword}&7[&a%{_maxplayer}%&7] %{_itemname}%")
 
-            set name of {_item} to "{@keyword}&f[&a%{_maxplayer}%&f] - &r%name of {_item}%"
+            event.getDrops().get({_index}).setItemMeta({_itemmeta})
 
-            #set {_item_name} to {_items}.get({_index}).getItemMeta().getDisplayName()
-            #{_items}.get({_index}).getItemMeta().setDisplayName("test")
-            add {_item} to {_drops::*}
-        event.getDrops().clear()
-        drop {_drops::*} at event.getEntity()
         delete {mob_damage::%{_uuid}%::*}
-
-
-on pickup:
-    if name of event-item contains "{@keyword}":
-        cancel event
-        if name of event-item contains name of player:
-            delete event-entity
-            set {_it} to event-item
-            set {_name} to name of event-item
-            replace all "{@keyword}&f[&a%name of player%&f] - " with "" in {_name}
-            set name of {_it} to {_name}
-            if player's inventory contains air:
-                give {_it} to player
-            else:
-                drop {_it} at location of player
-        #else:
-        #	send "&c此物品不屬於你"
 
 on damage:
     if attacker is player:
