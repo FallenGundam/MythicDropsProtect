@@ -1,0 +1,2 @@
+# MythicDropsProtect
+可依玩家對怪物造成的傷害來判斷掉落物歸誰
