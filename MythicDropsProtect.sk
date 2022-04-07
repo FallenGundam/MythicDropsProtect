@@ -60,7 +60,7 @@ on pickup:
             delete event-entity
             set {_it} to event-item
             set {_name} to name of event-item
-            replace all "&0MM&f[&a%name of player%&f] - " with "" in {_name}
+            replace all "{@keyword}&f[&a%name of player%&f] - " with "" in {_name}
             set name of {_it} to {_name}
             if player's inventory contains air:
                 give {_it} to player
