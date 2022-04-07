@@ -12,3 +12,6 @@
 * 在此新增怪物的名稱以禁用保護
 #### keyword: &0MM
 * 可以不用改動,這是判斷是否為mm怪物的掉落物
+
+
+<img width="686" alt="image" src="https://user-images.githubusercontent.com/54828956/162133987-feca920a-1bdd-4101-9a87-7bb1da93dcfc.png">
