@@ -1,5 +1,6 @@
 # MythicDropsProtect
 可依玩家對怪物造成的傷害來判斷掉落物歸誰  
+目前此腳本僅支援mm怪物的掉落物,其他插件及原版怪物皆不支持
 <img width="686" alt="image" src="https://user-images.githubusercontent.com/54828956/162133987-feca920a-1bdd-4101-9a87-7bb1da93dcfc.png"> 
 
 # required:
