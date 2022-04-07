@@ -34,7 +34,7 @@ on PlayerPickupItemEvent:
             {_meta}.setDisplayName({_itname})
             event.getItem().getItemStack().setItemMeta({_meta})
         else:
-            event.cancelled(true)
+            event.setCancelled(true)
 
 on MythicMobDespawnEvent:
     set {_uuid} to event.getEntity().getUniqueId()
