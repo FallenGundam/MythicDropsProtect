@@ -5,7 +5,7 @@
 
 # required:
 * paper or spigot 1.13.2~1.18.2 
-* mythicmobs 4.9~4.11 (i'm not sure) 
+* mythicmobs 4.6~4.13  
 * skript 2.3.7 - lastest 
 * skript-reflect 
 
