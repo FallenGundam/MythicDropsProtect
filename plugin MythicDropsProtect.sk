@@ -1,0 +1,192 @@
+#name: MythicDropsProtect  by FallenGundam
+#version: v1.0.1
+#         v1.1.0 - 2023/3/19
+#date: 2022/4/7
+#required:
+	#paper 1.13.2~1.18.2 
+	#mythicmobs 4.9~4.11 (i'm not sure)
+	#skript 2.3.7 - lastest
+	#skript-reflect
+
+	#skrayfall
+	#itemnbtapi
+
+#dc: FallenGundam#8864
+
+options:
+	owner_text: &c擁有者
+	blacklist: "&cWolrdBoss" or "&bWorldBoss2"
+	# 開啟一般怪物掉落物保護
+	Enable_MobProtect: false
+	# 開啟挖礦掉落物保護
+	Enable_BlockProtect: false
+	# 開啟掉落物的holo字幕顯示   
+	Enable_itemHolo: true
+
+
+import:
+	de.tr7zw.nbtapi.NBT
+	de.tr7zw.nbtapi.NBTItem
+	org.bukkit.event.entity.ItemSpawnEvent
+	org.bukkit.event.entity.ItemDespawnEvent
+	org.bukkit.event.entity.ItemMergeEvent
+	org.bukkit.event.player.PlayerPickupItemEvent
+	com.destroystokyo.paper.event.entity.EntityRemoveFromWorldEvent
+	org.bukkit.event.block.BlockDropItemEvent
+
+	io.lumine.xikage.mythicmobs.MythicMobs
+	io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDeathEvent
+	io.lumine.xikage.mythicmobs.api.bukkit.events.MythicMobDespawnEvent
+
+function isMythicMob(e:entity) :: boolean:
+	return MythicMobs.inst().getAPIHelper().isMythicMob({_e}) 
+# command /mmtest:
+# 	trigger:
+# 		set {_item} to player's tool
+# 		set {_nbt} to new NBTItem({_item})
+# 		{_nbt}.setString("owner",name of player)
+# 		give {_nbt}.getItem() to player
+on death:
+	if {@Enable_MobProtect} = true:
+		if attacker is a player:
+			if victim isn't a player:
+				if isMythicMob(victim) = false:
+					set {_uuid} to uuid of victim
+					if {mob_damage::%{_uuid}%::*} is set:
+						set {_maxvalue} to 0
+						set {_maxplayer} to ""
+						loop {mob_damage::%{_uuid}%::*}:
+							if loop-value > {_maxvalue}:
+								set {_maxvalue} to loop-value
+								set {_maxplayer} to loop-index parsed as player
+						set {_items} to event.getDrops()
+						loop {_items}.size() times:
+							set {_index} to (loop-value)-1
+							set {_nbt} to new NBTItem({_items}.get({_index}))
+							{_nbt}.setString("owner",name of {_maxplayer})
+							{_nbt}.applyNBT({_items}.get({_index}))
+						delete {mob_damage::%{_uuid}%::*}
+
+
+on BlockDropItemEvent:
+	if {@Enable_BlockProtect} = true:
+		set {_items} to event.getItems()
+		loop {_items}.size() times:
+			set {_index} to (loop-value)-1
+			set {_nbt} to new NBTItem({_items}.get({_index}).getItemStack())
+			{_nbt}.setString("owner",event.getPlayer().getName())
+			{_nbt}.applyNBT({_items}.get({_index}).getItemStack())
+
+
+on EntityRemoveFromWorldEvent:
+	if event.getEntityType().toString() = "DROPPED_ITEM":
+		set {_itemstack} to event.getEntity().getItemStack()
+		if {_itemstack} isn't air:
+			set {_nbti} to new NBTItem({_itemstack})
+			if {_nbti}.hasTag("owner"):
+				delete holo object "itemowner::%event.getEntity().getUniqueId()%"
+			if {@Enable_itemHolo} = true:
+				delete holo object "itemdrop::%event.getEntity().getUniqueId()%"
+	if {@Enable_MobProtect} = true:
+		set {_uuid} to event.getEntity().getUniqueId()
+		if {mob_damage::%{_uuid}%::*} is set:
+			delete {mob_damage::%{_uuid}%::*}
+
+on ItemDespawnEvent:
+	set {_itemstack} to event.getEntity().getItemStack()
+	set {_nbti} to new NBTItem({_itemstack})
+	if {_nbti}.hasTag("owner"):
+		delete holo object "itemowner::%event.getEntity().getUniqueId()%"
+	if {@Enable_itemHolo} = true:
+		delete holo object "itemdrop::%event.getEntity().getUniqueId()%"
+
+on ItemMergeEvent:
+	set {_entity} to event.getEntity()
+	set {_itemstack} to {_entity}.getItemStack()
+	set {_nbti} to new NBTItem(event.getEntity().getItemStack())
+	if {_nbti}.hasTag("owner"):
+		delete holo object "itemowner::%{_entity}.getUniqueId()%"
+	if {@Enable_itemHolo} = true:
+		set {_target} to event.getTarget()
+		delete holo object "itemdrop::%{_entity}.getUniqueId()%"
+		if name of {_itemstack} is set:
+			set {_display} to name of {_itemstack}
+		else:
+			set {_display} to type of {_itemstack}
+		set {_amo1} to {_entity}.getItemStack().getAmount()
+		set {_amo2} to {_target}.getItemStack().getAmount()
+		edit holo object "itemdrop::%{_target}.getUniqueId()%" to "%{_display}% &fx %{_amo1} + {_amo2}%"
+
+on ItemSpawnEvent:
+	set {_entity} to event.getEntity()
+	set {_itemstack} to event.getEntity().getItemStack()
+	set {_nbti} to new NBTItem({_itemstack})
+	if {_nbti}.hasTag("owner"):
+		set {_owner} to {_nbti}.getString("owner")
+		create bound holo object "{@owner_text} &f[&a%{_owner}%&f]" with id "itemowner::%{_entity}.getUniqueId()%" to {_entity} offset by 0, 1, 0
+	if {@Enable_itemHolo} = true:
+		if name of {_itemstack} is set:
+			set {_display} to name of {_itemstack}
+		else:
+			set {_display} to type of {_itemstack}
+		create bound holo object "%{_display}% &fx %{_itemstack}.getAmount()%" with id "itemdrop::%{_entity}.getUniqueId()%" to {_entity} offset by 0, 0.75, 0
+
+on PlayerPickupItemEvent:
+	set {_player} to event.getPlayer()
+	set {_playername} to name of {_player}
+	set {_nbtitem} to new NBTItem(event.getItem().getItemStack())
+	if {_nbtitem}.hasTag("owner"):
+		set {_owner} to {_nbtitem}.getString("owner")
+		if {_owner} = name of {_player}:
+			delete holo object "itemowner::%event.getItem().getUniqueId()%"
+			{_nbtitem}.removeKey("owner")
+			{_nbtitem}.applyNBT(event.getItem().getItemStack())
+		else:
+			event.setCancelled(true)
+on MythicMobDespawnEvent:
+	set {_uuid} to event.getEntity().getUniqueId()
+	if {mob_damage::%{_uuid}%::*} is set:
+		delete {mob_damage::%{_uuid}%::*}
+on MythicMobDeathEvent:
+	set {_uuid} to event.getEntity().getUniqueId()
+	set {_p} to event.getKiller()
+	if {mob_damage::%{_uuid}%::*} is set:
+		set {_maxvalue} to 0
+		set {_maxplayer} to ""
+		loop {mob_damage::%{_uuid}%::*}:
+			if loop-value > {_maxvalue}:
+				set {_maxvalue} to loop-value
+				set {_maxplayer} to loop-index parsed as player
+		set {_items} to event.getDrops()
+
+		loop {_items}.size() times:
+			set {_index} to (loop-value)-1
+
+			set {_nbt} to new NBTItem({_items}.get({_index}))
+			{_nbt}.setString("owner",name of {_maxplayer})
+
+			event.getDrops().set({_index},{_nbt}.getItem())
+
+		delete {mob_damage::%{_uuid}%::*}
+
+on damage:
+	if attacker is player:
+		if victim isn't player:
+			if name of victim isn't {@blacklist}:
+				if {@Enable_MobProtect} = true:
+					set {_run} to true
+				if isMythicMob(victim) = true:
+					set {_run} to true
+				if {_run} = true:
+					set {_uuid} to victim's uuid
+					if {mob_damage::%{_uuid}%::%attacker%} isn't set:
+						set {mob_damage::%{_uuid}%::%attacker%} to 0
+					if damage > victim's health:
+						add victim's health to {mob_damage::%{_uuid}%::%attacker%}
+					else:
+						add damage to {mob_damage::%{_uuid}%::%attacker%}
+				
+
+on skript unload:
+	delete {mob_damage::*}
+
