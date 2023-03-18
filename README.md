@@ -16,9 +16,9 @@
 # settings:
   owner_text: &c擁有者
   blacklist: "&cWolrdBoss" or "&bWorldBoss2"
-  # 開啟一般怪物掉落物保護
+  #### 開啟一般怪物掉落物保護
   Enable_MobProtect: false
-  # 開啟挖礦掉落物保護
+  #### 開啟挖礦掉落物保護
   Enable_BlockProtect: false
-  # 開啟掉落物的holo字幕顯示   
+  #### 開啟掉落物的holo字幕顯示   
   Enable_itemHolo: true
