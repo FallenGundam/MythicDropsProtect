@@ -25,3 +25,5 @@
   Enable_BlockProtect: false
   ##### 開啟掉落物的holo字幕顯示   
   Enable_itemHolo: true
+# API:  
+  isMythicMob(entity) - 是否為mm怪物
