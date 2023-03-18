@@ -15,7 +15,7 @@
 * holographicDisplays
 
 # settings:
-  owner_text: &c擁有者
+  owner_text: &c擁有者  
   blacklist: "&cWolrdBoss" or "&bWorldBoss2"
   ##### 開啟一般怪物掉落物保護
   Enable_MobProtect: false
