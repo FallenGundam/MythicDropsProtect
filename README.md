@@ -1,16 +1,24 @@
-# MythicDropsProtect
+# MythicDropsProtect v1.1.0
 可依玩家對怪物造成的傷害來判斷掉落物歸誰  
-目前此腳本僅支援mm怪物的掉落物,其他插件及原版怪物皆不支持
-<img width="686" alt="image" src="https://user-images.githubusercontent.com/54828956/162133987-feca920a-1bdd-4101-9a87-7bb1da93dcfc.png"> 
+此版本經過大量改動，以支持普通怪物、挖礦掉落物的保護
+並且支援掉落物品holo字幕顯示
+![2023-03-19_06 02 09](https://user-images.githubusercontent.com/54828956/226142602-8b428962-d034-491c-aaa7-5f374633c57e.png)
 
 # required:
-* paper or spigot 1.13.2~1.18.2 
+* paper 1.13.2~1.18.2 
 * mythicmobs 4.6~4.13  
 * skript 2.3.7 - lastest 
 * skript-reflect 
+* ItemNBTAPI
+* skrayfall
+* holographicDisplays
 
 # settings:
-#### blacklist: "&cWolrdBoss" or "&bWorldBoss2"
-* 在此新增怪物的名稱以禁用保護
-#### keyword: &0*
-* 可以不用改動,這是判斷是否為mm怪物的掉落物
+  owner_text: &c擁有者
+  blacklist: "&cWolrdBoss" or "&bWorldBoss2"
+  # 開啟一般怪物掉落物保護
+  Enable_MobProtect: false
+  # 開啟挖礦掉落物保護
+  Enable_BlockProtect: false
+  # 開啟掉落物的holo字幕顯示   
+  Enable_itemHolo: true
